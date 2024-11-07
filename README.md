@@ -64,6 +64,10 @@
    3. Name your app
    4. Select "Accounts in any organizational directory"
    5. Set Redirect URI: https://your-domain.vercel.app/api/auth/callback/azure-ad
+   OR
+   6. Authentication - Add Platform  -
+   https://your-domain.vercel.app/api/auth/callback/azure-ad
+   https://your-domain.vercel.app/api/auth/signin/azure-ad
    ```
 
 2. **Configure Permissions**
@@ -151,6 +155,7 @@
    MICROSOFT_CLIENT_SECRET=your_client_secret
    NEXTAUTH_URL=https://your-domain.vercel.app
    NEXTAUTH_SECRET=generated_secret_key
+   NEXT_PUBLIC_CLOUDFLARE_DOMAIN=https://your-domain.workers.dev
    ```
 
 3. **Deploy Settings**
