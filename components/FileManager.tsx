@@ -40,6 +40,10 @@ export default function FileManager() {
     const [itemToDelete, setItemToDelete] = useState<FileItem | null>(null)
     const [selectedFileForRename, setSelectedFileForRename] = useState<FileItem | null>(null)
 
+    // Add caching
+    const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+    const fileListCache = new Map<string, { data: FileItem[], timestamp: number }>();
+
     useEffect(() => {
         loadFiles()
     }, [currentPath])
@@ -47,6 +51,15 @@ export default function FileManager() {
     const loadFiles = async () => {
         try {
             setLoading(true)
+
+            // Check cache first
+            const cached = fileListCache.get(currentPath);
+            if (cached && (Date.now() - cached.timestamp < CACHE_DURATION)) {
+                setFiles(cached.data);
+                setLoading(false);
+                return;
+            }
+
             const service = await getOneDriveService()
             const fileList = await service.listFiles(currentPath)
             setFiles(fileList)
@@ -55,6 +68,12 @@ export default function FileManager() {
             const stats = await service.getPublicFolderStats()
             setTotalSize(stats.size)
             setTotalItems(stats.itemCount)
+
+            // Update cache
+            fileListCache.set(currentPath, {
+                data: fileList,
+                timestamp: Date.now()
+            });
         } catch (error) {
             console.error('Error loading files:', error)
             alert('Failed to load files')
@@ -209,6 +228,8 @@ export default function FileManager() {
             // Then refresh file list
             await loadFiles()
 
+            // Clear cache when needed
+            clearCache();
         } catch (error) {
             console.error('Error deleting item:', error)
             alert('Failed to delete item')
@@ -376,6 +397,11 @@ export default function FileManager() {
             document.removeEventListener('click', handleGlobalClick)
         }
     }, [])
+
+    // Clear cache after operations
+    const clearCache = () => {
+        fileListCache.clear();
+    };
 
     return (
         <div className="container mx-auto p-4">

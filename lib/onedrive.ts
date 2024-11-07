@@ -294,7 +294,6 @@ export class OneDriveService {
 
     async getDownloadUrl(itemId: string): Promise<string> {
         try {
-            // Get file details including download URL
             const response = await this.client
                 .api(`/me/drive/items/${itemId}`)
                 .get();
@@ -307,8 +306,11 @@ export class OneDriveService {
 
             const fileName = response.name;
 
-            // Create short Cloudflare Worker URL with file ID
-            const workerUrl = `https://tgdown.k-drama.workers.dev/download/${encodeURIComponent(fileName)}?ID=${itemId}`;
+            // Fallback URL if env variable is not set
+            const CLOUDFLARE_DOMAIN = process.env.NEXT_PUBLIC_CLOUDFLARE_DOMAIN || 'https://tgdown.k-drama.workers.dev';
+
+            // Create Cloudflare Worker URL with file ID
+            const workerUrl = `${CLOUDFLARE_DOMAIN}/download/${encodeURIComponent(fileName)}?ID=${itemId}`;
 
             return workerUrl;
         } catch (error) {
