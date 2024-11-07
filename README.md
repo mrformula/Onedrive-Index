@@ -112,6 +112,7 @@
 
       MICROSOFT_CLIENT_ID=your_client_id
       MICROSOFT_CLIENT_SECRET=your_client_secret
+      Tenant_ID=tenant_id
    ```
 
 ### 3️⃣ MongoDB Setup
